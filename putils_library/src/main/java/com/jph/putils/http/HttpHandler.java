@@ -1,6 +1,7 @@
 package com.jph.putils.http;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.jph.putils.http.callback.RequestCallBack;
@@ -58,6 +59,7 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
         conn.setDoInput(true);
         conn.setDoOutput(true);
         conn.setRequestMethod(request.getMethod().toString());
+        if (!TextUtils.isEmpty(HttpConfig.cookie))conn.setRequestProperty("Cookie",HttpConfig.cookie);
         HttpConfig config=request.getConfig();
         if (config==null)return;
         if (config.isEnableJsonContentType())conn.setRequestProperty("Content-type", "application/json");//使用application/json

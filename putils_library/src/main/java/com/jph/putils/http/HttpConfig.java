@@ -6,11 +6,11 @@ package com.jph.putils.http;
  * Date: 2015/10/14 0014 13:37
  */
 public class HttpConfig {
+    public static String cookie;
     /**是否启用application/json Content-type的标识*/
     private boolean enableJsonContentType;
     private int connectTimeout;
     private boolean useCaches ;
-
     /**
      * 设置是否启用application/json Content-type的标识
      * @param enableJsonContentType
@@ -31,6 +31,16 @@ public class HttpConfig {
         return this;
     }
     /**
+     * 设置Cookie
+     * @param cookie
+     * @return
+     */
+    public HttpConfig setCookie (String cookie){
+        this.cookie=cookie;
+        return this;
+    }
+
+    /**
      * 设置连接是否允许使用缓存
      * @param newValue
      * @return
@@ -50,5 +60,8 @@ public class HttpConfig {
 
     public boolean isEnableJsonContentType() {
         return enableJsonContentType;
+    }
+    public String getCookie() {
+        return cookie;
     }
 }
