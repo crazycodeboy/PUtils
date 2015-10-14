@@ -24,6 +24,7 @@ public class Utils {
      * @return
      */
     public static String genFormData(Map<String, Object> params){
+        if (params==null)return "";
         StringBuffer paramsData=new StringBuffer();
         Set<String> keys=params.keySet();
         for(String key:keys){
@@ -47,6 +48,7 @@ public class Utils {
      * @return
      */
     public static String mapToJsonStr(Map<String ,Object > params){
+        if (params==null)return "";
         StringBuffer paramsData=new StringBuffer("{");
         Set<String> keys=params.keySet();
         for(String key:keys){

@@ -66,7 +66,7 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
         ResponseInfo responseInfo=new ResponseInfo();
         HttpURLConnection conn = null;
         try {
-            if (!isWithData)request.setUrl(Utils.genUrlWithParam(request.getParams(),request.getUrl()));
+            if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(),request.getUrl()));
             URL url = new URL(request.getUrl());
             conn= (HttpURLConnection) url.openConnection();
             initConfig(conn);
