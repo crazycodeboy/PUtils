@@ -7,7 +7,6 @@ import com.jph.putils.http.callback.RequestCallBack;
 /**
  * 网络操作工具类
  * Author: JPH
- *
  * Date: 2015/10/10 0010 16:55
  */
 public class HttpUtil {
