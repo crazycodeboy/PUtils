@@ -53,11 +53,11 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
             callBack.onFailure(responseInfo.error);
         }
     }
-    private void initConfig(HttpURLConnection conn) throws ProtocolException {
+    private void initConfig(HttpURLConnection conn,boolean isWithData) throws ProtocolException {
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);
         conn.setDoInput(true);
-        conn.setDoOutput(true);
+        if (isWithData)conn.setDoOutput(true);//如果需要上传数据则打开输出设置
         conn.setRequestMethod(request.getMethod().toString());
         if (!TextUtils.isEmpty(HttpConfig.cookie))conn.setRequestProperty("Cookie",HttpConfig.cookie);
         HttpConfig config=request.getConfig();
@@ -71,7 +71,7 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
             if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(),request.getUrl()));
             URL url = new URL(request.getUrl());
             conn= (HttpURLConnection) url.openConnection();
-            initConfig(conn);
+            initConfig(conn,isWithData);
             if (isWithData)uploadData(conn);
             if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 String cookieStr = conn.getHeaderField("Set-Cookie");
