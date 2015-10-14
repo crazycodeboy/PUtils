@@ -78,7 +78,7 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
                 String result = Utils.getStringFromInputStream(conn.getInputStream());
                 responseInfo.responseContent=result;
                 responseInfo.isSuccess=true;
-                responseInfo.cookieStr=cookieStr;
+                responseInfo.setCookieStr(cookieStr);
                 Log.i("info", "cookieStr:" + cookieStr);
                 Log.i("info", "result:" + result);
             } else {
