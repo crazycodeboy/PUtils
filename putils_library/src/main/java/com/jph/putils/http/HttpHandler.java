@@ -8,6 +8,7 @@ import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.http.entity.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
+import com.jph.putils.util.HttpCodeUtil;
 import com.jph.putils.util.Utils;
 
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
                 result = Utils.getStringFromInputStream(conn.getInputStream());
             } else {
                 result = Utils.getStringFromInputStream(conn.getErrorStream());
-                responseInfo=new HttpException(responseInfo,"ResponseCode:" + conn.getResponseCode());
+                responseInfo=new HttpException(responseInfo, HttpCodeUtil.getCodeMessage(responseInfo.getHttpCode()));
             }
             responseInfo.setResponseContent(result);
             Log.i("info", "result:" + result);
