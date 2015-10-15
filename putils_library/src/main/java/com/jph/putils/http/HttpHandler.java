@@ -70,24 +70,26 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         BaseResponseInfo responseInfo=new BaseResponseInfo();
         HttpURLConnection conn = null;
         try {
-            if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(),request.getUrl()));
+            if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(), request.getUrl()));
             URL url = new URL(request.getUrl());
             conn= (HttpURLConnection) url.openConnection();
-            initConfig(conn,isWithData);
+            initConfig(conn, isWithData);
             if (isWithData)uploadData(conn);
             int httpCode=conn.getResponseCode();
             responseInfo.setHttpCode(httpCode);
             String cookieStr = conn.getHeaderField("Set-Cookie");
             responseInfo.setCookie(cookieStr);
-            String result = Utils.getStringFromInputStream(conn.getInputStream());
-            responseInfo.setResponseContent(result);
             Log.i("info", "cookieStr:" + cookieStr);
-            Log.i("info", "result:" + result);
-            if (httpCode== HttpURLConnection.HTTP_OK) {
+            String result=null;
+            if (httpCode<300) {
                 responseInfo=new ResponseInfo(responseInfo);
+                result = Utils.getStringFromInputStream(conn.getInputStream());
             } else {
+                result = Utils.getStringFromInputStream(conn.getErrorStream());
                 responseInfo=new HttpException(responseInfo,"ResponseCode:" + conn.getResponseCode());
             }
+            responseInfo.setResponseContent(result);
+            Log.i("info", "result:" + result);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             responseInfo=new HttpException(responseInfo,e.toString());
