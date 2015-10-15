@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.jph.putils.http.callback.RequestCallBack;
+import com.jph.putils.http.entity.BaseResponseInfo;
+import com.jph.putils.http.entity.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
 import com.jph.putils.util.Utils;
 
@@ -21,7 +23,7 @@ import java.net.URL;
  * Author: JPH
  * Date: 2015/10/14 0014 10:37
  */
-public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
+public class HttpHandler extends AsyncTask<String, Integer, Object> {
     private HttpRequest request;
     private RequestCallBack callBack;
     public HttpHandler(HttpRequest request, RequestCallBack callBack) {
@@ -33,7 +35,7 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
         super.onPreExecute();
     }
     @Override
-    protected ResponseInfo doInBackground(String... params) {
+    protected Object doInBackground(String... params) {
         if (Utils.isWithData(request.getMethod())) {
             return onSend(true);
         } else {
@@ -45,12 +47,12 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
         super.onProgressUpdate(values);
     }
     @Override
-    protected void onPostExecute(ResponseInfo responseInfo) {
-        super.onPostExecute(responseInfo);
-        if (responseInfo.isSuccess){
-            callBack.onSuccess(responseInfo.responseContent,responseInfo.cookieStr);
+    protected void onPostExecute(Object info) {
+        super.onPostExecute(info);
+        if (info instanceof ResponseInfo){
+            callBack.onSuccess((ResponseInfo)info);
         }else {
-            callBack.onFailure(responseInfo.error);
+            callBack.onFailure((HttpException)info);
         }
     }
     private void initConfig(HttpURLConnection conn,boolean isWithData) throws ProtocolException {
@@ -64,8 +66,8 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
         if (config==null)return;
         if (config.isEnableJsonContentType())conn.setRequestProperty("Content-type", "application/json");//使用application/json
     }
-    private ResponseInfo onSend(boolean isWithData) {
-        ResponseInfo responseInfo=new ResponseInfo();
+    private Object onSend(boolean isWithData) {
+        BaseResponseInfo responseInfo=new BaseResponseInfo();
         HttpURLConnection conn = null;
         try {
             if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(),request.getUrl()));
@@ -73,23 +75,25 @@ public class HttpHandler extends AsyncTask<String, Integer, ResponseInfo> {
             conn= (HttpURLConnection) url.openConnection();
             initConfig(conn,isWithData);
             if (isWithData)uploadData(conn);
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                String cookieStr = conn.getHeaderField("Set-Cookie");
-                String result = Utils.getStringFromInputStream(conn.getInputStream());
-                responseInfo.responseContent=result;
-                responseInfo.isSuccess=true;
-                responseInfo.setCookieStr(cookieStr);
-                Log.i("info", "cookieStr:" + cookieStr);
-                Log.i("info", "result:" + result);
+            int httpCode=conn.getResponseCode();
+            responseInfo.setHttpCode(httpCode);
+            String cookieStr = conn.getHeaderField("Set-Cookie");
+            responseInfo.setCookie(cookieStr);
+            String result = Utils.getStringFromInputStream(conn.getInputStream());
+            responseInfo.setResponseContent(result);
+            Log.i("info", "cookieStr:" + cookieStr);
+            Log.i("info", "result:" + result);
+            if (httpCode== HttpURLConnection.HTTP_OK) {
+                responseInfo=new ResponseInfo(responseInfo);
             } else {
-                responseInfo.error="ResponseCode:" + conn.getResponseCode();
+                responseInfo=new HttpException(responseInfo,"ResponseCode:" + conn.getResponseCode());
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            responseInfo.error=e.getMessage();
+            responseInfo=new HttpException(responseInfo,e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
-            responseInfo.error=e.getMessage();
+            responseInfo=new HttpException(responseInfo,e.getMessage());
         } finally {
             if (conn != null) conn.disconnect();
         }

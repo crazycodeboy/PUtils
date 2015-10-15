@@ -3,6 +3,8 @@ package com.jph.putils;
 import com.jph.putils.http.HttpRequest;
 import com.jph.putils.http.HttpHandler;
 import com.jph.putils.http.callback.RequestCallBack;
+import com.jph.putils.http.entity.BaseResponseInfo;
+import com.jph.putils.http.entity.HttpException;
 
 /**
  * 网络操作工具类
@@ -20,7 +22,7 @@ public class HttpUtil {
             new HttpHandler(request,callBack).execute();
         } catch (Exception e) {
             e.printStackTrace();
-            callBack.onFailure(e.getMessage());
+            callBack.onFailure(new HttpException(new BaseResponseInfo(),e.getMessage()));
         }
     }
 }
