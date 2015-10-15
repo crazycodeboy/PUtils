@@ -90,10 +90,10 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            responseInfo=new HttpException(responseInfo,e.getMessage());
+            responseInfo=new HttpException(responseInfo,e.getCause().toString());
         } catch (IOException e) {
             e.printStackTrace();
-            responseInfo=new HttpException(responseInfo,e.getMessage());
+            responseInfo=new HttpException(responseInfo,e.getCause().toString());
         } finally {
             if (conn != null) conn.disconnect();
         }

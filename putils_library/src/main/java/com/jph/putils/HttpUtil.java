@@ -22,7 +22,7 @@ public class HttpUtil {
             new HttpHandler(request,callBack).execute();
         } catch (Exception e) {
             e.printStackTrace();
-            callBack.onFailure(new HttpException(new BaseResponseInfo(),e.getMessage()));
+            callBack.onFailure(new HttpException(new BaseResponseInfo(),e.getCause().toString()));
         }
     }
 }
