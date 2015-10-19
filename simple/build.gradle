@@ -24,6 +24,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
-    compile project(':ksd_android_other/:PUtils/:putils_library')
-    compile project(':ksd_android_other/:KLoginSdk')
+    compile project(':putils_library')
+//    compile project(':ksd_android_other/:KLoginSdk')
 }

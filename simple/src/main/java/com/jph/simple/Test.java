@@ -10,7 +10,7 @@ import com.jph.putils.http.HttpRequest;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
-import com.ksudi.lib.android.login.KLogin;
+//import com.ksudi.lib.android.login.KLogin;
 
 public class Test extends Activity {
 
