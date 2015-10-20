@@ -1,5 +1,7 @@
 package com.jph.putils.http.entity;
 
+import android.text.TextUtils;
+
 import com.jph.putils.HttpUtil;
 
 /**
@@ -26,7 +28,7 @@ public class BaseResponseInfo {
 
     public void setCookie(String cookie) {
         this.cookie = cookie;
-        HttpUtil.cookie=cookie;
+       if(!TextUtils.isEmpty(cookie)) HttpUtil.cookie=cookie;
     }
 
     public int getHttpCode() {
