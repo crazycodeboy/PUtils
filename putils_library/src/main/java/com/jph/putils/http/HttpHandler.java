@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.jph.putils.HttpUtil;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.http.entity.HttpException;
@@ -62,7 +63,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         conn.setDoInput(true);
         if (isWithData)conn.setDoOutput(true);//如果需要上传数据则打开输出设置
         conn.setRequestMethod(request.getMethod().toString());
-        if (!TextUtils.isEmpty(HttpConfig.cookie))conn.setRequestProperty("Cookie",HttpConfig.cookie);
+        if (!TextUtils.isEmpty(HttpUtil.cookie))conn.setRequestProperty("Cookie",HttpUtil.cookie);
         HttpConfig config=request.getConfig();
         if (config==null)return;
         if (config.isEnableJsonContentType())conn.setRequestProperty("Content-type", "application/json");//使用application/json

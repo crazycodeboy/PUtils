@@ -1,12 +1,14 @@
 package com.jph.putils.http;
 
+import com.jph.putils.HttpUtil;
+
 /**
  * HttpURLConnection配置类
  * Author: JPH
  * Date: 2015/10/14 0014 13:37
  */
 public class HttpConfig {
-    public static String cookie;
+    private String cookie;
     /**是否启用application/json Content-type的标识*/
     private boolean enableJsonContentType;
     private int connectTimeout;
@@ -37,6 +39,7 @@ public class HttpConfig {
      */
     public HttpConfig setCookie (String cookie){
         this.cookie=cookie;
+        HttpUtil.cookie=cookie;
         return this;
     }
 

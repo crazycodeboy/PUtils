@@ -1,6 +1,6 @@
 package com.jph.putils.http.entity;
 
-import com.jph.putils.http.HttpConfig;
+import com.jph.putils.HttpUtil;
 
 /**
  * Author: JPH
@@ -26,7 +26,7 @@ public class BaseResponseInfo {
 
     public void setCookie(String cookie) {
         this.cookie = cookie;
-        HttpConfig.cookie=cookie;
+        HttpUtil.cookie=cookie;
     }
 
     public int getHttpCode() {
