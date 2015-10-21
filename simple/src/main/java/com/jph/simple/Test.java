@@ -11,6 +11,7 @@ import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
 import com.ksudi.lib.android.login.KLogin;
+import com.ksudi.lib.android.login.util.LoginConfig;
 
 public class Test extends Activity {
 
@@ -23,7 +24,7 @@ public class Test extends Activity {
         textView= (TextView) findViewById(R.id.test);
     }
     public void login(View view){
-        KLogin.login(this,"526971370@qq.com", "123456", new RequestCallBack() {
+        KLogin.login(this,getLoginConfig(),"526971370@qq.com", "123456", new RequestCallBack() {
             @Override
             public void onSuccess(ResponseInfo info) {
                 textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie());
@@ -63,5 +64,18 @@ public class Test extends Activity {
                 textView.setText("注销失败："+error.getErrorMsg());
             }
         });
+    }
+
+    /**
+     * 获取登录Url配置
+     * @return
+     */
+    public static LoginConfig getLoginConfig(){
+        LoginConfig config=new LoginConfig();
+        config.setLoginUrl("http://192.168.1.18:1054/cas/api1/login")
+                .setLogoutUrl("http://192.168.1.18:1054/cas/api1/logout")
+                .setTicketUrl("http://192.168.1.18:1061/api/android/client/test/login/1")
+                .setUploadLogUrl("http://192.168.1.18:1054/cas/api1/uploadLog");
+        return config;
     }
 }
