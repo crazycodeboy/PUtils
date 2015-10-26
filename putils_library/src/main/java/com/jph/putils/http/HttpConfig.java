@@ -1,7 +1,5 @@
 package com.jph.putils.http;
 
-import com.jph.putils.HttpUtil;
-
 /**
  * HttpURLConnection配置类
  * Author: JPH
@@ -39,7 +37,7 @@ public class HttpConfig {
      */
     public HttpConfig setCookie (String cookie){
         this.cookie=cookie;
-        HttpUtil.cookie=cookie;
+//        HttpUtil.cookie=cookie;
         return this;
     }
 

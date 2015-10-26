@@ -1,84 +1,36 @@
-
 package com.jph.putils.exception;
 
-public class HttpException extends BaseException {
-    private static final long serialVersionUID = 1L;
+import com.jph.putils.http.entity.BaseResponseInfo;
 
-    private int exceptionCode;
-    private String entity;
-    /**
-     * 
-     * @return The http response httpEntity
-     */
-    public String getEntity() {
-        return entity;
+/**
+ * Author: JPH
+ * Date: 2015/10/15 0015 11:17
+ */
+public class HttpException extends BaseException{
+    private String errorMsg;
+    private BaseResponseInfo responseInfo;
+    public HttpException(BaseResponseInfo responseInfo,String errorMsg) {
+        super(errorMsg);
+        this.responseInfo=responseInfo;
+        this.errorMsg=errorMsg;
     }
-    public HttpException() {
+    public HttpException(BaseResponseInfo responseInfo,String errorMsg,Throwable throwable) {
+        super(errorMsg,throwable);
+        this.responseInfo=responseInfo;
+        this.errorMsg=errorMsg;
     }
-
-    public HttpException(String detailMessage) {
-        super(detailMessage);
+    public String getErrorMsg() {
+        return errorMsg;
     }
-
-    public HttpException(String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
-    }
-
-    public HttpException(Throwable throwable) {
-        super(throwable);
-    }
-
-    /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
-     */
-    public HttpException(int exceptionCode) {
-        this.exceptionCode = exceptionCode;
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 
-    /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
-     * @param detailMessage
-     */
-    public HttpException(int exceptionCode, String detailMessage) {
-        super(detailMessage);
-        this.exceptionCode = exceptionCode;
+    public BaseResponseInfo getResponseInfo() {
+        return responseInfo;
     }
 
-    /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
-     * @param detailMessage
-     * @param throwable
-     */
-    public HttpException(int exceptionCode, String detailMessage, Throwable throwable) {
-        super(detailMessage, throwable);
-        this.exceptionCode = exceptionCode;
-    }
-
-    /**
-     * @param exceptionCode The http response status code, 0 if the http request error and has no response.
-     * @param throwable
-     */
-    public HttpException(int exceptionCode, Throwable throwable) {
-        super(throwable);
-        this.exceptionCode = exceptionCode;
-    }
-
-    /**
-     * 对于非正常状态下，返回HTTP entity
-     * @param exceptionCode 
-     * @param detailMessage
-     * @param entity  HTTP entity
-     * @author JPG
-     * @Date 2015-7-1 下午2:08:37
-     */
-    public HttpException(int exceptionCode, String detailMessage, String entity) {
-    	this(exceptionCode, detailMessage);
-    	this.entity=entity;
-	}
-	/**
-     * @return The http response status code, 0 if the http request error and has no response.
-     */
-    public int getExceptionCode() {
-        return exceptionCode;
+    public void setResponseInfo(BaseResponseInfo responseInfo) {
+        this.responseInfo = responseInfo;
     }
 }

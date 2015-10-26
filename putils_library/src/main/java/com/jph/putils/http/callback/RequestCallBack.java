@@ -1,6 +1,6 @@
 package com.jph.putils.http.callback;
 
-import com.jph.putils.http.entity.HttpException;
+import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
 
 /**

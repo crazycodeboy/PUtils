@@ -7,7 +7,7 @@ import android.util.Log;
 import com.jph.putils.HttpUtil;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
-import com.jph.putils.http.entity.HttpException;
+import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
 import com.jph.putils.util.HttpCodeUtil;
 import com.jph.putils.util.Utils;
@@ -63,12 +63,14 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         conn.setDoInput(true);
         if (isWithData)conn.setDoOutput(true);//如果需要上传数据则打开输出设置
         conn.setRequestMethod(request.getMethod().toString());
-        if (!TextUtils.isEmpty(HttpUtil.cookie))conn.setRequestProperty("Cookie",HttpUtil.cookie);
+//        if (!TextUtils.isEmpty(HttpUtil.cookie))conn.setRequestProperty("Cookie",HttpUtil.cookie);
         HttpConfig config=request.getConfig();
         if (config==null)return;
+        conn.setRequestProperty("Cookie",config.getCookie());
         if (config.isEnableJsonContentType())conn.setRequestProperty("Content-type", "application/json");//使用application/json
     }
     private Object onSend(boolean isWithData) {
+        Object object = null;
         BaseResponseInfo responseInfo=new BaseResponseInfo();
         HttpURLConnection conn = null;
         try {
@@ -84,24 +86,25 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
             Log.i("info", "cookieStr:" + cookieStr);
             String result=null;
             if (httpCode<300) {
-                responseInfo=new ResponseInfo(responseInfo);
                 result = Utils.getStringFromInputStream(conn.getInputStream());
+                responseInfo.setResponseContent(result);
+                object=new ResponseInfo(responseInfo);
             } else {
                 result = Utils.getStringFromInputStream(conn.getErrorStream());
-                responseInfo=new HttpException(responseInfo, HttpCodeUtil.getCodeMessage(responseInfo.getHttpCode()));
+                responseInfo.setResponseContent(result);
+                object=new HttpException(responseInfo, HttpCodeUtil.getCodeMessage(responseInfo.getHttpCode()));
             }
-            responseInfo.setResponseContent(result);
             Log.i("info", "result:" + result);
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            responseInfo=new HttpException(responseInfo,e.toString());
+            object=new HttpException(responseInfo,e.toString());
         } catch (IOException e) {
             e.printStackTrace();
-            responseInfo=new HttpException(responseInfo,e.toString());
+            object=new HttpException(responseInfo,e.toString());
         } finally {
             if (conn != null) conn.disconnect();
         }
-        return responseInfo;
+        return object;
     }
 
     /**
