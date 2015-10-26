@@ -13,6 +13,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.jph.putils.exception.HttpException;
+import com.jph.putils.http.DownloadHandler;
+import com.jph.putils.http.entity.BaseResponseInfo;
+
 /**
  * 
  * 利用Http协议进行多线程下载具体实践类
@@ -126,9 +130,10 @@ public class DownloadHttpTool {
 	 */
 	private void initFirst() {
 		Log.w(TAG, "initFirst");
+		HttpURLConnection connection=null;
 		try {
 			URL url = new URL(urlstr);
-			HttpURLConnection connection = (HttpURLConnection) url
+			connection = (HttpURLConnection) url
 					.openConnection();
 			connection.setConnectTimeout(5000);
 			connection.setRequestMethod("GET");
@@ -149,6 +154,9 @@ public class DownloadHttpTool {
 			connection.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
+			sendDownLoadErrorMessage(null,e.toString());
+		}finally {
+			if (connection!=null)connection.disconnect();
 		}
 		int range = fileSize / threadCount;
 		downloadInfos = new ArrayList<DownloadInfo>();
@@ -190,6 +198,10 @@ public class DownloadHttpTool {
 
 		@Override
 		public void run() {
+//			if ( (startPos + compeleteSize)>=endPos){//此部分的数据下载完成
+//				sqlTool.updataInfos(threadId, compeleteSize, urlstr);
+//				return;
+//			}
 			HttpURLConnection connection = null;
 			RandomAccessFile randomAccessFile = null;
 			InputStream is = null;
@@ -203,17 +215,14 @@ public class DownloadHttpTool {
 				connection.setRequestMethod("GET");
 				connection.setRequestProperty("Range", "bytes="
 						+ (startPos + compeleteSize) + "-" + endPos);
+				Log.i(TAG,"Range ：bytes="+ (startPos + compeleteSize) + "-" + endPos+" total::" + totalThreadSize);
 				is = connection.getInputStream();
 				byte[] buffer = new byte[1024];
 				int length = -1;
 				while ((length = is.read(buffer)) != -1) {
 					randomAccessFile.write(buffer, 0, length);
 					compeleteSize += length;
-					Message message = Message.obtain();
-					message.what = threadId;
-					message.obj = urlstr;
-					message.arg1 = length;
-					mHandler.sendMessage(message);
+					sendUpdateMessage(length);
 					Log.w(TAG, "Threadid::" + threadId + "    compelete::"
 							+ compeleteSize + "    total::" + totalThreadSize);
 					// 当程序不再是下载状态的时候，纪录当前的下载进度
@@ -226,6 +235,7 @@ public class DownloadHttpTool {
 
 			} catch (Exception e) {
 				e.printStackTrace();
+				sendDownLoadErrorMessage(null, e.toString());
 				sqlTool.updataInfos(threadId, compeleteSize, urlstr);
 			} finally {
 				try {
@@ -233,11 +243,36 @@ public class DownloadHttpTool {
 						is.close();
 					}
 					randomAccessFile.close();
-					connection.disconnect();
+					if (connection!=null)connection.disconnect();
 				} catch (Exception e) {
 					e.printStackTrace();
+					sendDownLoadErrorMessage(null, e.toString());
 				}
 			}
 		}
+	}
+
+	/**
+	 * 发送下载失败的消息
+	 * @param errorMsg
+	 */
+	private void sendDownLoadErrorMessage(BaseResponseInfo info,String errorMsg){
+		HttpException error=new HttpException(info,errorMsg);
+		Message msg=new Message();
+		msg.obj=error;
+		msg.what= DownloadHandler.WHAT_ERROR;
+		mHandler.sendMessage(msg);
+		state=Download_State.Pause;
+	}
+	/**
+	 * 发送更新下载进度的消息
+	 * @param length
+	 */
+	private void sendUpdateMessage(int length){
+		Message message = Message.obtain();
+		message.what =DownloadHandler.WHAT_UPDATE;
+		message.obj = urlstr;
+		message.arg1 = length;
+		mHandler.sendMessage(message);
 	}
 }

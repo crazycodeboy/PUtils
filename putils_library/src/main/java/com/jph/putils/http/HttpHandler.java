@@ -1,17 +1,13 @@
 package com.jph.putils.http;
 
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
-
-import com.jph.putils.HttpUtil;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.entity.ResponseInfo;
 import com.jph.putils.util.HttpCodeUtil;
 import com.jph.putils.util.Utils;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.CookieHandler;

@@ -9,6 +9,11 @@ import com.jph.putils.http.entity.BaseResponseInfo;
 public class HttpException extends BaseException{
     private String errorMsg;
     private BaseResponseInfo responseInfo;
+
+    public HttpException(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
     public HttpException(BaseResponseInfo responseInfo,String errorMsg) {
         super(errorMsg);
         this.responseInfo=responseInfo;
