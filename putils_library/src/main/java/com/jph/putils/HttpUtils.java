@@ -11,9 +11,9 @@ import com.jph.putils.exception.HttpException;
  * Author: JPH
  * Date: 2015/10/10 0010 16:55
  */
-public class HttpUtil {
+public class HttpUtils {
 //    public static String cookie;
-    public HttpUtil() {}
+    public HttpUtils() {}
     /**
      * 发送请求
      * @param callBack 请求回调

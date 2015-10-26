@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.jph.simple.TestDownLoad"
+            android:name="com.jph.simple.Test"
             android:label="@string/title_activity_test"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
