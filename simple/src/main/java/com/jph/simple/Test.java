@@ -27,6 +27,10 @@ public class Test extends Activity {
     public void login(View view){
         KLogin.login(this,getLoginConfig(),"526971370@qq.com", "123456", new RequestCallBack() {
             @Override
+            public void onStart() { }
+            @Override
+            public void onLoading(long total, long current, boolean isUploading) {  }
+            @Override
             public void onSuccess(ResponseInfo info) {
                 textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie());
                 cookie=info.getCookie();
@@ -43,6 +47,16 @@ public class Test extends Activity {
         HttpUtils HttpUtils=new HttpUtils();
         HttpUtils.send(new HttpRequest("http://192.168.1.18:1061/api/android/client/expressGroup/searchExpressGroup/1",HttpRequest.HttpMethod.GET, null,new HttpConfig().setCookie(cookie)), new RequestCallBack() {
             @Override
+            public void onStart() {
+                textView.setText("onStart");
+            }
+
+            @Override
+            public void onLoading(long total, long current, boolean isUploading) {
+                textView.setText("onLoading:total:"+total+" current:"+current);
+            }
+
+            @Override
             public void onSuccess(ResponseInfo info) {
                 textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie());
             }
@@ -57,6 +71,10 @@ public class Test extends Activity {
 
     public void exit(View view){
         KLogin.exit(new RequestCallBack() {
+            @Override
+            public void onStart() { }
+            @Override
+            public void onLoading(long total, long current, boolean isUploading) {  }
             @Override
             public void onSuccess(ResponseInfo info) {
                 textView.setText("注销成功：" + info.getResponseContent());

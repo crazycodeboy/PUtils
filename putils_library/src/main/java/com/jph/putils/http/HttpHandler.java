@@ -22,6 +22,7 @@ import java.net.URL;
  * Date: 2015/10/14 0014 10:37
  */
 public class HttpHandler extends AsyncTask<String, Integer, Object> {
+    private static final String TAG = HttpHandler.class.getSimpleName();
     private HttpRequest request;
     private RequestCallBack callBack;
     public HttpHandler(HttpRequest request, RequestCallBack callBack) {
@@ -31,6 +32,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        callBack.onStart();
     }
     @Override
     protected Object doInBackground(String... params) {
@@ -43,6 +45,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
+        Log.i(TAG,"onProgressUpdate:"+values);
     }
     @Override
     protected void onPostExecute(Object info) {

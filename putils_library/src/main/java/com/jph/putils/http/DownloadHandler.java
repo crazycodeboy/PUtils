@@ -8,7 +8,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.jph.putils.exception.HttpException;
-import com.jph.putils.http.callback.RequestCallBack1;
+import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.download.DownloadHttpTool;
 import com.jph.putils.http.entity.DownLoadAction;
 
@@ -23,7 +23,7 @@ public class DownloadHandler implements DownLoadAction{
 	private DownloadHttpTool mDownloadHttpTool;
 	private long fileSize;
 	private long downloadedSize = 0;
-	private RequestCallBack1 requestCallBack;
+	private RequestCallBack requestCallBack;
 
 	@SuppressLint("HandlerLeak")
 	private Handler mHandler = new Handler() {
@@ -55,10 +55,10 @@ public class DownloadHandler implements DownLoadAction{
 		}
 
 	};
-	public DownloadHandler(String url, String target,Context context,RequestCallBack1 callBack1) {
+	public DownloadHandler(String url, String target,Context context,RequestCallBack callBack1) {
 		this(url,target,2,context,callBack1);
 	}
-	public DownloadHandler(String url, String target,int threadCount, Context context,RequestCallBack1 callBack1) {
+	public DownloadHandler(String url, String target,int threadCount, Context context,RequestCallBack callBack1) {
 		if (threadCount>4)threadCount=4;
 		this.requestCallBack=callBack1;
 		mDownloadHttpTool = new DownloadHttpTool(url,target,threadCount,context,mHandler);

@@ -1,12 +1,10 @@
 package com.jph.putils;
 
 import android.content.Context;
-
 import com.jph.putils.http.DownloadHandler;
 import com.jph.putils.http.HttpRequest;
 import com.jph.putils.http.HttpHandler;
 import com.jph.putils.http.callback.RequestCallBack;
-import com.jph.putils.http.callback.RequestCallBack1;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.exception.HttpException;
 
@@ -41,7 +39,7 @@ public class HttpUtils {
      * @param callBack 下载回调
      * @return DownloadHandler,提供了暂停、开始、重置、删除下载控制接口
      */
-    public DownloadHandler download(String url, String target,int threadCount,Context context,RequestCallBack1 callBack){
+    public DownloadHandler download(String url, String target,int threadCount,Context context,RequestCallBack callBack){
         DownloadHandler handler=null;
         try {
             handler=new DownloadHandler(url,target,threadCount,context,callBack);
@@ -59,7 +57,7 @@ public class HttpUtils {
      * @param callBack 下载回调
      * @return DownloadHandler,提供了暂停、开始、重置、删除下载控制接口
      */
-    public DownloadHandler download(String url, String target,Context context,RequestCallBack1 callBack){
+    public DownloadHandler download(String url, String target,Context context,RequestCallBack callBack){
         DownloadHandler handler=null;
         try {
             handler=new DownloadHandler(url,target,context,callBack);
