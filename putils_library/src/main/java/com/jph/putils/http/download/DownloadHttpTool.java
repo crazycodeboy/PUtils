@@ -38,14 +38,15 @@ public class DownloadHttpTool implements DownLoadAction{
 	private int fileSize;
 	// 文件信息保存的数据库操作类
 	private DownlaodSqlTool sqlTool;
-
+	//下载文件的最后一次修改时间
+	private long lastModified;
 	// 利用枚举表示下载的三种状态
-	private enum Download_State {
-		Downloading, Pause, Ready, Delete;
+	public enum DownloadState {
+		Downloading, Pause, Ready, Delete,Fail;
 	}
 
 	// 当前下载状态
-	private Download_State state = Download_State.Ready;
+	private DownloadState state = DownloadState.Ready;
 	// 所有线程下载的总数
 	private int globalCompelete = 0;
 
@@ -61,17 +62,20 @@ public class DownloadHttpTool implements DownLoadAction{
 	}
 
 	// 在开始下载之前需要调用ready方法进行配置
-	public void ready() {
+	public DownloadState ready() {
+		if (state == DownloadState.Downloading) {
+			return DownloadState.Downloading;
+		}
 		Log.w(TAG, "ready");
 		globalCompelete = 0;
 		downloadInfos = sqlTool.getInfos(urlstr);
 		if (downloadInfos.size() == 0) {
-			initFirst();
+			if (!initFirst())return DownloadState.Fail;
 		} else {
 			File file = new File(target);
 			if (!file.exists()) {
 				sqlTool.delete(urlstr);
-				initFirst();
+				if (!initFirst())return DownloadState.Fail;
 			} else {
 				fileSize = downloadInfos.get(downloadInfos.size() - 1)
 						.getEndPos();
@@ -81,15 +85,16 @@ public class DownloadHttpTool implements DownLoadAction{
 				Log.w(TAG, "globalCompelete:::" + globalCompelete);
 			}
 		}
+		return DownloadState.Ready;
 	}
 	@Override
 	public void onStart() {
 		Log.w(TAG, "onStart");
 		if (downloadInfos != null) {
-			if (state == Download_State.Downloading) {
+			if (state == DownloadState.Downloading) {
 				return;
 			}
-			state = Download_State.Downloading;
+			state = DownloadState.Downloading;
 			for (DownloadInfo info : downloadInfos) {
 				Log.v(TAG, "startThread");
 				new DownloadThread(info).start();
@@ -98,12 +103,12 @@ public class DownloadHttpTool implements DownLoadAction{
 	}
 	@Override
 	public void onPause() {
-		state = Download_State.Pause;
+		state = DownloadState.Pause;
 		sqlTool.closeDb();
 	}
 	@Override
 	public void onDelete() {
-		state = Download_State.Delete;
+		state = DownloadState.Delete;
 		compelete();
 		new File(target).delete();
 	}
@@ -127,7 +132,7 @@ public class DownloadHttpTool implements DownLoadAction{
 	/**
 	 * 第一次下载初始化
 	 */
-	private void initFirst() {
+	private boolean initFirst() {
 		Log.w(TAG, "initFirst");
 		HttpURLConnection connection=null;
 		try {
@@ -136,7 +141,9 @@ public class DownloadHttpTool implements DownLoadAction{
 					.openConnection();
 			connection.setConnectTimeout(5000);
 			connection.setRequestMethod("GET");
+			int httpCode=connection.getResponseCode();
 			fileSize = connection.getContentLength();
+			lastModified=connection.getLastModified();
 			Log.w(TAG, "fileSize::" + fileSize);
 			String fileParentPath=new File(target).getParent();
 			File fileParent = new File(fileParentPath);
@@ -149,12 +156,13 @@ public class DownloadHttpTool implements DownLoadAction{
 			}
 			// 本地访问文件
 			RandomAccessFile accessFile = new RandomAccessFile(file, "rwd");
-			accessFile.setLength(fileSize);
+			if (fileSize>0)accessFile.setLength(fileSize);
 			accessFile.close();
 			connection.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendDownLoadErrorMessage(null,e.toString());
+			return false;
 		}finally {
 			if (connection!=null)connection.disconnect();
 		}
@@ -162,13 +170,14 @@ public class DownloadHttpTool implements DownLoadAction{
 		downloadInfos = new ArrayList<DownloadInfo>();
 		for (int i = 0; i < threadCount - 1; i++) {
 			DownloadInfo info = new DownloadInfo(i, i * range, (i + 1) * range
-					- 1, 0, urlstr);
+					- 1, 0, urlstr,lastModified);
 			downloadInfos.add(info);
 		}
 		DownloadInfo info = new DownloadInfo(threadCount - 1, (threadCount - 1)
-				* range, fileSize - 1, 0, urlstr);
+				* range, fileSize - 1, 0, urlstr,lastModified);
 		downloadInfos.add(info);
 		sqlTool.insertInfos(downloadInfos);
+		return true;
 	}
 
 	/**
@@ -198,10 +207,6 @@ public class DownloadHttpTool implements DownLoadAction{
 
 		@Override
 		public void run() {
-//			if ( (startPos + compeleteSize)>=endPos){//此部分的数据下载完成
-//				sqlTool.updataInfos(threadId, compeleteSize, urlstr);
-//				return;
-//			}
 			HttpURLConnection connection = null;
 			RandomAccessFile randomAccessFile = null;
 			InputStream is = null;
@@ -215,6 +220,10 @@ public class DownloadHttpTool implements DownLoadAction{
 				connection.setRequestProperty("Range", "bytes="
 						+ (startPos + compeleteSize) + "-" + endPos);
 				Log.i(TAG,"Range ：bytes="+ (startPos + compeleteSize) + "-" + endPos+" total::" + totalThreadSize);
+				if(downloadInfo.getLastModified()!=connection.getLastModified()){//下载的文件发生了改变
+					mHandler.sendEmptyMessage(DownloadHandler.WHAT_CHANGE);
+					return;
+				}
 				is = connection.getInputStream();
 				byte[] buffer = new byte[1024];
 				int length = -1;
@@ -225,7 +234,7 @@ public class DownloadHttpTool implements DownLoadAction{
 					Log.w(TAG, "Threadid::" + threadId + "    compelete::"
 							+ compeleteSize + "    total::" + totalThreadSize);
 					// 当程序不再是下载状态的时候，纪录当前的下载进度
-					if ((state != Download_State.Downloading)
+					if ((state != DownloadState.Downloading)
 							|| (compeleteSize >= totalThreadSize)) {
 						sqlTool.updataInfos(threadId, compeleteSize, urlstr);
 						break;
@@ -263,7 +272,7 @@ public class DownloadHttpTool implements DownLoadAction{
 		msg.obj=error;
 		msg.what= DownloadHandler.WHAT_ERROR;
 		mHandler.sendMessage(msg);
-		state=Download_State.Pause;
+		onPause();
 	}
 	/**
 	 * 发送下载失败的消息

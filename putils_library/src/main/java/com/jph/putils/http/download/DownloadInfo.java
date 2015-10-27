@@ -1,20 +1,28 @@
 package com.jph.putils.http.download;
 
 public class DownloadInfo {
-
-	private int threadId;// 下载器id
-	private int startPos;// 开始点
-	private int endPos;// 结束点
-	private int compeleteSize;// 完成度
-	private String url;// 下载文件的URL地址
+	/**下载线程id**/
+	private int threadId;
+	/**开始点**/
+	private int startPos;
+	/**结束点**/
+	private int endPos;
+	/**完成度**/
+	private int compeleteSize;
+	/**下载文件的URL地址**/
+	private String url;
+	/**当前下载线程是否出错**/
 	private boolean isError;
+	/**下载文件的最后一次修改时间**/
+	private long lastModified;
 	public DownloadInfo(int threadId, int startPos, int endPos,
-			int compeleteSize, String url) {
+			int compeleteSize, String url,long lastModified) {
 		this.threadId = threadId;
 		this.startPos = startPos;
 		this.endPos = endPos;
 		this.compeleteSize = compeleteSize;
 		this.url = url;
+		this.lastModified=lastModified;
 	}
 
 	public DownloadInfo() {
@@ -66,6 +74,14 @@ public class DownloadInfo {
 
 	public void setIsError(boolean isError) {
 		this.isError = isError;
+	}
+
+	public long getLastModified() {
+		return lastModified;
+	}
+
+	public void setLastModified(long lastModified) {
+		this.lastModified = lastModified;
 	}
 
 	@Override

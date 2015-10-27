@@ -21,8 +21,8 @@ public class DownLoadHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("create table download_info(_id integer PRIMARY KEY AUTOINCREMENT, thread_id integer, "
-				+ "start_pos integer, end_pos integer, compelete_size integer,url char)");
+		db.execSQL("create table download_info(_id integer PRIMARY KEY AUTOINCREMENT, thread_id , "
+				+ "start_pos , end_pos , compelete_size ,url char,last_modified )");
 	}
 
 	@Override

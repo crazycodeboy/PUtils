@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-
+import com.jph.putils.http.download.DownloadHttpTool.DownloadState;
 import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.download.DownloadHttpTool;
@@ -20,6 +20,8 @@ public class DownloadHandler implements DownLoadAction{
 	public final static int WHAT_ERROR=-1;
 	/** * 更新下载进度	 */
 	public final static int WHAT_UPDATE=1;
+	/** * 要下载的文件发生了改变*/
+	public final static int WHAT_CHANGE=0;
 	private DownloadHttpTool mDownloadHttpTool;
 	private long fileSize;
 	private long downloadedSize = 0;
@@ -51,6 +53,9 @@ public class DownloadHandler implements DownLoadAction{
 						requestCallBack.onFailure((HttpException) msg.obj);
 					}
 					break;
+				case WHAT_CHANGE://下载的文件发生了改变
+					onReset();
+					break;
 			}
 		}
 
@@ -66,14 +71,14 @@ public class DownloadHandler implements DownLoadAction{
 	// 下载之前首先异步线程调用ready方法获得文件大小信息，之后调用开始方法
 	@Override
 	public void onStart() {
-		new AsyncTask<Void, Void, Void>() {
+		new AsyncTask<Void, Void, DownloadState>() {
 			@Override
-			protected Void doInBackground(Void... arg0) {
-				mDownloadHttpTool.ready();
-				return null;
+			protected DownloadState doInBackground(Void... arg0) {
+				return mDownloadHttpTool.ready();
 			}
 			@Override
-			protected void onPostExecute(Void result) {
+			protected void onPostExecute(DownloadState state) {
+				if (!DownloadState.Ready.equals(state))return;
 				fileSize = mDownloadHttpTool.getFileSize();
 				downloadedSize = mDownloadHttpTool.getCompeleteSize();
 				Log.w("Tag", "downloadedSize::" + downloadedSize);

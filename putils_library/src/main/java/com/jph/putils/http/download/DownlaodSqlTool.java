@@ -25,9 +25,9 @@ public class DownlaodSqlTool {
 	public void insertInfos(List<DownloadInfo> infos) {
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
 		for (DownloadInfo info : infos) {
-			String sql = "insert into download_info(thread_id,start_pos, end_pos,compelete_size,url) values (?,?,?,?,?)";
+			String sql = "insert into download_info(thread_id,start_pos, end_pos,compelete_size,url,last_modified) values (?,?,?,?,?,?)";
 			Object[] bindArgs = { info.getThreadId(), info.getStartPos(),
-					info.getEndPos(), info.getCompeleteSize(), info.getUrl() };
+					info.getEndPos(), info.getCompeleteSize(), info.getUrl(),info.getLastModified() };
 			database.execSQL(sql, bindArgs);
 		}
 	}
@@ -38,12 +38,12 @@ public class DownlaodSqlTool {
 	public List<DownloadInfo> getInfos(String urlstr) {
 		List<DownloadInfo> list = new ArrayList<DownloadInfo>();
 		SQLiteDatabase database = dbHelper.getWritableDatabase();
-		String sql = "select thread_id, start_pos, end_pos,compelete_size,url from download_info where url=?";
+		String sql = "select thread_id, start_pos, end_pos,compelete_size,url,last_modified from download_info where url=?";
 		Cursor cursor = database.rawQuery(sql, new String[] { urlstr });
 		while (cursor.moveToNext()) {
 			DownloadInfo info = new DownloadInfo(cursor.getInt(0),
 					cursor.getInt(1), cursor.getInt(2), cursor.getInt(3),
-					cursor.getString(4));
+					cursor.getString(4),cursor.getLong(5));
 			list.add(info);
 		}
 		return list;
