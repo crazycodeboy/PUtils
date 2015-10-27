@@ -16,12 +16,13 @@ import android.util.Log;
 import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.DownloadHandler;
 import com.jph.putils.http.entity.BaseResponseInfo;
+import com.jph.putils.http.entity.DownLoadAction;
 
 /**
  * 
  * 利用Http协议进行多线程下载具体实践类
  */
-public class DownloadHttpTool {
+public class DownloadHttpTool implements DownLoadAction{
 
 	private static final String TAG = DownloadHttpTool.class.getSimpleName();
 	// 线程数量
@@ -84,9 +85,9 @@ public class DownloadHttpTool {
 			}
 		}
 	}
-
-	public void start() {
-		Log.w(TAG, "start");
+	@Override
+	public void onStart() {
+		Log.w(TAG, "onStart");
 		if (downloadInfos != null) {
 			if (state == Download_State.Downloading) {
 				return;
@@ -100,18 +101,21 @@ public class DownloadHttpTool {
 			}
 		}
 	}
-
-	public void pause() {
+	@Override
+	public void onPause() {
 		state = Download_State.Pause;
 		sqlTool.closeDb();
 	}
-
-	public void delete() {
+	@Override
+	public void onDelete() {
 		state = Download_State.Delete;
 		compelete();
 		new File(localPath + File.separator + fileName).delete();
 	}
-
+	@Override
+	public void onReset() {
+		onDelete();
+	}
 	public void compelete() {
 		sqlTool.delete(urlstr);
 		sqlTool.closeDb();

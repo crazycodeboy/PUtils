@@ -10,11 +10,12 @@ import android.util.Log;
 import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.callback.RequestCallBack1;
 import com.jph.putils.http.download.DownloadHttpTool;
+import com.jph.putils.http.entity.DownLoadAction;
 
 /**
  * 将下载方法封装在此类 提供下载，暂停，删除，以及重置的方法
  */
-public class DownloadHandler {
+public class DownloadHandler implements DownLoadAction{
 	/** * 下载失败	 */
 	public final static int WHAT_ERROR=-1;
 	/** * 更新下载进度	 */
@@ -63,7 +64,8 @@ public class DownloadHandler {
 	}
 
 	// 下载之前首先异步线程调用ready方法获得文件大小信息，之后调用开始方法
-	public void start() {
+	@Override
+	public void onStart() {
 		new AsyncTask<Void, Void, Void>() {
 			@Override
 			protected Void doInBackground(Void... arg0) {
@@ -80,23 +82,23 @@ public class DownloadHandler {
 					mDownloadHttpTool.compelete();
 				}else {
 					requestCallBack.onStart();
-					mDownloadHttpTool.start();
+					mDownloadHttpTool.onStart();
 				}
 			}
 		}.execute();
 	}
-
-	public void pause() {
-		mDownloadHttpTool.pause();
+	@Override
+	public void onPause() {
+		mDownloadHttpTool.onPause();
 	}
-
-	public void delete() {
-		mDownloadHttpTool.delete();
+	@Override
+	public void onDelete() {
+		mDownloadHttpTool.onDelete();
 	}
-
-	public void reset() {
-		mDownloadHttpTool.delete();
-		start();
+	@Override
+	public void onReset() {
+		mDownloadHttpTool.onReset();
+		onStart();
 	}
 
 	public void setOnDownloadListener(RequestCallBack1 requestCallBack) {

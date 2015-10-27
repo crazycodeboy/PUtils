@@ -7,7 +7,7 @@ import  com.jph.putils.exception.DbException;
 import java.util.*;
 
 /**
- * Build "insert", "replace",，"update", "delete" and "create" sql.
+ * Build "insert", "replace",，"update", "onDelete" and "create" sql.
  */
 public class SqlInfoBuilder {
 
@@ -78,7 +78,7 @@ public class SqlInfoBuilder {
         return result;
     }
 
-    //*********************************************** delete sql ***********************************************
+    //*********************************************** onDelete sql ***********************************************
 
     private static String buildDeleteSqlByTableName(String tableName) {
         return "DELETE FROM " + tableName;
