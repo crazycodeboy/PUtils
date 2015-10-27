@@ -51,11 +51,15 @@
         android:layout_alignBottom="@id/button_start"
         android:layout_toRightOf="@id/button_delete"
         android:text="重新下载" />
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button_reset"
+        android:id="@+id/tvMsg"/>
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/button_reset" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvMsg" />
 
 </RelativeLayout>

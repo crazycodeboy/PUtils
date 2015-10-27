@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import com.jph.putils.HttpUtil;
+import com.jph.putils.HttpUtils;
 import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.HttpConfig;
 import com.jph.putils.http.HttpRequest;
@@ -40,8 +40,8 @@ public class Test extends Activity {
         });
     }
     public void access(View view){
-        HttpUtil httpUtil=new HttpUtil();
-        httpUtil.send(new HttpRequest("http://192.168.1.18:1061/api/android/client/expressGroup/searchExpressGroup/1",HttpRequest.HttpMethod.GET, null,new HttpConfig().setCookie(cookie)), new RequestCallBack() {
+        HttpUtils HttpUtils=new HttpUtils();
+        HttpUtils.send(new HttpRequest("http://192.168.1.18:1061/api/android/client/expressGroup/searchExpressGroup/1",HttpRequest.HttpMethod.GET, null,new HttpConfig().setCookie(cookie)), new RequestCallBack() {
             @Override
             public void onSuccess(ResponseInfo info) {
                 textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie());

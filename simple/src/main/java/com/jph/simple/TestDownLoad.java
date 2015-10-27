@@ -1,17 +1,22 @@
 package com.jph.simple;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.jph.putils.HttpUtils;
+import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.DownloadHandler;
+import com.jph.putils.http.callback.RequestCallBack1;
+import com.jph.putils.http.entity.BaseResponseInfo;
+import com.jph.putils.http.entity.ResponseInfo;
 
 public class TestDownLoad extends FragmentActivity {
 
@@ -22,8 +27,8 @@ public class TestDownLoad extends FragmentActivity {
 	private Button pause;
 	private Button delete;
 	private Button reset;
-	private TextView total;
-
+	private TextView tvCurrent;
+	private TextView tvMsg;
 	private ImageView image;
 
 	private int max;
@@ -39,56 +44,77 @@ public class TestDownLoad extends FragmentActivity {
 		pause = (Button) findViewById(R.id.button_pause);
 		delete = (Button) findViewById(R.id.button_delete);
 		reset = (Button) findViewById(R.id.button_reset);
-		total = (TextView) findViewById(R.id.textView_total);
+		tvCurrent = (TextView) findViewById(R.id.textView_total);
+		tvMsg = (TextView) findViewById(R.id.tvMsg);
 		image = (ImageView) findViewById(R.id.image);
 
 		String urlString = "http://pic.ksudi.com/Ksudi_parttime.apk";
-		final String localPath = Environment.getExternalStorageDirectory()
-				.getAbsolutePath() + "/ADownLoadTest";
-		mDownloadUtil = new DownloadHandler(2, localPath, "abc.apk", urlString,
-				this);
-		mDownloadUtil.setOnDownloadListener(new DownloadHandler.OnDownloadListener() {
-
+		final String target = Environment.getExternalStorageDirectory()
+				.getAbsolutePath() + "/ADownLoadTest/abc.apk";
+		mDownloadUtil = new HttpUtils().download(urlString,target,this,new RequestCallBack1() {
 			@Override
-			public void downloadStart(int fileSize) {
-				max = fileSize;
-				mProgressBar.setMax(fileSize);
+			public void onStart() {
+				mProgressBar.setMax(100);
 			}
 
 			@Override
-			public void downloadProgress(int downloadedSize) {
-				mProgressBar.setProgress(downloadedSize);
-				total.setText((int) downloadedSize * 100 / max + "%");
+			public void onLoading(long total, long current, boolean isUploading) {
+				int i= (int) (current*1.0/total*100);
+				tvCurrent.setText(i + "%");
+				mProgressBar.setProgress(i);
+				StringBuffer sb=new StringBuffer();
+				sb.append("下载中：");
+				sb.append("total:").append(total);
+				sb.append("current:").append(current);
+				tvMsg.setText(sb.toString());
 			}
 
 			@Override
-			public void downloadEnd() {
-//				Bitmap bitmap = decodeSampledBitmapFromResource(localPath
-//						+ File.separator + "abc.jpg", 200, 200);
-//				image.setImageBitmap(bitmap);
+			public void onSuccess(ResponseInfo info) {
+				StringBuffer sb=new StringBuffer();
+				sb.append("下载完成：");
+//				sb.append("httpCode:");
+//				sb.append(info.getHttpCode());
+//				sb.append("\nresponseContent:");
+//				sb.append(info.getResponseContent());
+				tvMsg.setText(sb.toString());
+			}
+
+			@Override
+			public void onFailure(HttpException error) {
+				BaseResponseInfo info=error.getResponseInfo();
+				StringBuffer sb=new StringBuffer();
+				sb.append("下载失败：");
+//				sb.append("\nhttpCode:");
+//				sb.append(info.getHttpCode());
+//				sb.append("\nerror:");
+				sb.append(error.getErrorMsg());
+//				sb.append("\nresponseContent:");
+//				sb.append(info.getResponseContent());
+				tvMsg.setText(sb.toString());
 			}
 		});
 		start.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				mDownloadUtil.start();
+				mDownloadUtil.onStart();
 			}
 		});
 		pause.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				mDownloadUtil.pause();
+				mDownloadUtil.onPause();
 			}
 		});
 		delete.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				mDownloadUtil.delete();
+				mDownloadUtil.onDelete();
 				mProgressBar.setProgress(0);
-				total.setText("0%");
+				tvCurrent.setText("0%");
 				image.setImageBitmap(null);
 			}
 		});
@@ -96,52 +122,23 @@ public class TestDownLoad extends FragmentActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				mDownloadUtil.reset();
+				mDownloadUtil.onReset();
 				mProgressBar.setProgress(0);
-				total.setText("0%");
+				tvCurrent.setText("0%");
 				image.setImageBitmap(null);
 			}
 		});
 
 	}
 
-	public static Bitmap decodeSampledBitmapFromResource(String fileName,
-			int reqWidth, int reqHeight) {
-
-		// First decode with inJustDecodeBounds=true to check dimensions
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(fileName, options);
-		// Calculate inSampleSize
-		options.inSampleSize = calculateInSampleSize(options, reqWidth,
-				reqHeight);
-		// Decode bitmap with inSampleSize set
-		options.inJustDecodeBounds = false;
-		return BitmapFactory.decodeFile(fileName, options);
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		return true;
 	}
 
-	public static int calculateInSampleSize(BitmapFactory.Options options,
-			int reqWidth, int reqHeight) {
-		// Raw height and width of image
-		final int height = options.outHeight;
-		final int width = options.outWidth;
-		int inSampleSize = 1;
-
-		if (height > reqHeight || width > reqWidth) {
-
-			final int halfHeight = height / 2;
-			final int halfWidth = width / 2;
-
-			// Calculate the largest inSampleSize value that is a power of 2 and
-			// keeps both
-			// height and width larger than the requested height and width.
-			while ((halfHeight / inSampleSize) > reqHeight
-					&& (halfWidth / inSampleSize) > reqWidth) {
-				inSampleSize *= 2;
-			}
-		}
-
-		return inSampleSize;
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 
 }
