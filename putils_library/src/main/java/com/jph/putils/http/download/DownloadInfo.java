@@ -7,7 +7,7 @@ public class DownloadInfo {
 	private int endPos;// 结束点
 	private int compeleteSize;// 完成度
 	private String url;// 下载文件的URL地址
-
+	private boolean isError;
 	public DownloadInfo(int threadId, int startPos, int endPos,
 			int compeleteSize, String url) {
 		this.threadId = threadId;
@@ -58,6 +58,14 @@ public class DownloadInfo {
 
 	public void setCompeleteSize(int compeleteSize) {
 		this.compeleteSize = compeleteSize;
+	}
+
+	public boolean isError() {
+		return isError;
+	}
+
+	public void setIsError(boolean isError) {
+		this.isError = isError;
 	}
 
 	@Override

@@ -95,9 +95,7 @@ public class DownloadHttpTool implements DownLoadAction{
 			state = Download_State.Downloading;
 			for (DownloadInfo info : downloadInfos) {
 				Log.v(TAG, "startThread");
-				new DownloadThread(info.getThreadId(), info.getStartPos(),
-						info.getEndPos(), info.getCompeleteSize(),
-						info.getUrl()).start();
+				new DownloadThread(info).start();
 			}
 		}
 	}
@@ -189,15 +187,15 @@ public class DownloadHttpTool implements DownLoadAction{
 		private int compeleteSize;
 		private String urlstr;
 		private int totalThreadSize;
-
-		public DownloadThread(int threadId, int startPos, int endPos,
-				int compeleteSize, String urlstr) {
-			this.threadId = threadId;
-			this.startPos = startPos;
-			this.endPos = endPos;
+		private DownloadInfo downloadInfo;
+		public DownloadThread(DownloadInfo downloadInfo) {
+			this.downloadInfo=downloadInfo;
+			this.threadId = downloadInfo.getThreadId();
+			this.startPos = downloadInfo.getStartPos();
+			this.endPos = downloadInfo.getEndPos();
 			totalThreadSize = endPos - startPos + 1;
-			this.urlstr = urlstr;
-			this.compeleteSize = compeleteSize;
+			this.urlstr = downloadInfo.getUrl();
+			this.compeleteSize = downloadInfo.getCompeleteSize();
 		}
 
 		@Override
@@ -239,7 +237,8 @@ public class DownloadHttpTool implements DownLoadAction{
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				sendDownLoadErrorMessage(null, e.toString());
+				sendDownLoadErrorMessage(null,downloadInfo, "threadId::" + threadId + e.toString());
+				Log.e(TAG, "threadId::" + threadId + e.toString());
 				sqlTool.updataInfos(threadId, compeleteSize, urlstr);
 			} finally {
 				try {
@@ -261,12 +260,25 @@ public class DownloadHttpTool implements DownLoadAction{
 	 * @param errorMsg
 	 */
 	private void sendDownLoadErrorMessage(BaseResponseInfo info,String errorMsg){
+
 		HttpException error=new HttpException(info,errorMsg);
 		Message msg=new Message();
 		msg.obj=error;
 		msg.what= DownloadHandler.WHAT_ERROR;
 		mHandler.sendMessage(msg);
 		state=Download_State.Pause;
+	}
+	/**
+	 * 发送下载失败的消息
+	 * @param downloadInfo 出错的线程要现在的信息描述
+	 * @param errorMsg 出错消息
+	 */
+	private void sendDownLoadErrorMessage(BaseResponseInfo info,DownloadInfo downloadInfo,String errorMsg){
+		downloadInfo.setIsError(true);
+		for (DownloadInfo temp:downloadInfos){//如果所有的下载线程都出错，则发送下载出错消息
+			if (!temp.isError())return;
+		}
+		sendDownLoadErrorMessage(info,errorMsg);
 	}
 	/**
 	 * 发送更新下载进度的消息
