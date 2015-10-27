@@ -1,6 +1,7 @@
 package com.jph.putils.http.download;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
@@ -17,6 +18,7 @@ import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.DownloadHandler;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.http.entity.DownLoadAction;
+import com.jph.putils.util.Utils;
 
 /**
  * 
@@ -137,28 +139,19 @@ public class DownloadHttpTool implements DownLoadAction{
 		HttpURLConnection connection=null;
 		try {
 			URL url = new URL(urlstr);
-			connection = (HttpURLConnection) url
-					.openConnection();
+			connection = (HttpURLConnection) url.openConnection();
 			connection.setConnectTimeout(5000);
 			connection.setRequestMethod("GET");
 			int httpCode=connection.getResponseCode();
-			fileSize = connection.getContentLength();
-			lastModified=connection.getLastModified();
-			Log.w(TAG, "fileSize::" + fileSize);
-			String fileParentPath=new File(target).getParent();
-			File fileParent = new File(fileParentPath);
-			if (!fileParent.exists()) {
-				fileParent.mkdir();
+			if (httpCode==200){
+				fileSize = connection.getContentLength();
+				Log.w(TAG, "fileSize::" + fileSize);
+				lastModified=connection.getLastModified();
+				connection.disconnect();
+				initConfig(fileSize);
+			}else {
+				return false;
 			}
-			File file = new File(target);
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			// 本地访问文件
-			RandomAccessFile accessFile = new RandomAccessFile(file, "rwd");
-			if (fileSize>0)accessFile.setLength(fileSize);
-			accessFile.close();
-			connection.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendDownLoadErrorMessage(null,e.toString());
@@ -166,6 +159,28 @@ public class DownloadHttpTool implements DownLoadAction{
 		}finally {
 			if (connection!=null)connection.disconnect();
 		}
+		return true;
+	}
+
+	/**
+	 * 初始化下载的配置信息（本地保存的文件，和数据库中下载配置信息）
+	 * @param fileSize
+	 * @throws IOException
+	 */
+	private void initConfig(int fileSize) throws IOException {
+		String fileParentPath=new File(target).getParent();
+		File fileParent = new File(fileParentPath);
+		if (!fileParent.exists()) {
+			fileParent.mkdir();
+		}
+		File file = new File(target);
+		if (!file.exists()) {
+			file.createNewFile();
+		}
+		// 本地访问文件
+		RandomAccessFile accessFile = new RandomAccessFile(file, "rwd");
+		if (fileSize>0)accessFile.setLength(fileSize);
+		accessFile.close();
 		int range = fileSize / threadCount;
 		downloadInfos = new ArrayList<DownloadInfo>();
 		for (int i = 0; i < threadCount - 1; i++) {
@@ -177,7 +192,6 @@ public class DownloadHttpTool implements DownLoadAction{
 				* range, fileSize - 1, 0, urlstr,lastModified);
 		downloadInfos.add(info);
 		sqlTool.insertInfos(downloadInfos);
-		return true;
 	}
 
 	/**
@@ -220,6 +234,11 @@ public class DownloadHttpTool implements DownLoadAction{
 				connection.setRequestProperty("Range", "bytes="
 						+ (startPos + compeleteSize) + "-" + endPos);
 				Log.i(TAG,"Range ：bytes="+ (startPos + compeleteSize) + "-" + endPos+" total::" + totalThreadSize);
+				int httpCode=connection.getResponseCode();
+				if (httpCode<200||httpCode>=300) {
+					sendDownLoadErrorMessage(null, Utils.getStringFromInputStream(connection.getErrorStream()));
+					return;
+				}
 				if(downloadInfo.getLastModified()!=connection.getLastModified()){//下载的文件发生了改变
 					mHandler.sendEmptyMessage(DownloadHandler.WHAT_CHANGE);
 					return;
@@ -266,7 +285,6 @@ public class DownloadHttpTool implements DownLoadAction{
 	 * @param errorMsg
 	 */
 	private void sendDownLoadErrorMessage(BaseResponseInfo info,String errorMsg){
-
 		HttpException error=new HttpException(info,errorMsg);
 		Message msg=new Message();
 		msg.obj=error;
