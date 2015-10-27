@@ -55,14 +55,14 @@ public class DownloadHandler implements DownLoadAction{
 		}
 
 	};
-
-	public DownloadHandler(int threadCount, String filePath, String filename,
-						   String urlString, Context context) {
-
-		mDownloadHttpTool = new DownloadHttpTool(threadCount, urlString,
-				filePath, filename, context, mHandler);
+	public DownloadHandler(String url, String target,Context context,RequestCallBack1 callBack1) {
+		this(url,target,2,context,callBack1);
 	}
-
+	public DownloadHandler(String url, String target,int threadCount, Context context,RequestCallBack1 callBack1) {
+		if (threadCount>4)threadCount=4;
+		this.requestCallBack=callBack1;
+		mDownloadHttpTool = new DownloadHttpTool(url,target,threadCount,context,mHandler);
+	}
 	// 下载之前首先异步线程调用ready方法获得文件大小信息，之后调用开始方法
 	@Override
 	public void onStart() {
@@ -99,9 +99,5 @@ public class DownloadHandler implements DownLoadAction{
 	public void onReset() {
 		mDownloadHttpTool.onReset();
 		onStart();
-	}
-
-	public void setOnDownloadListener(RequestCallBack1 requestCallBack) {
-		this.requestCallBack = requestCallBack;
 	}
 }

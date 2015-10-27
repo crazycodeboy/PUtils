@@ -33,10 +33,8 @@ public class DownloadHttpTool implements DownLoadAction{
 	private Handler mHandler;
 	// 保存下载信息的类
 	private List<DownloadInfo> downloadInfos;
-	// 目录
-	private String localPath;
-	// 文件名
-	private String fileName;
+	// 本地保存路径
+	private String target;
 	private int fileSize;
 	// 文件信息保存的数据库操作类
 	private DownlaodSqlTool sqlTool;
@@ -51,15 +49,14 @@ public class DownloadHttpTool implements DownLoadAction{
 	// 所有线程下载的总数
 	private int globalCompelete = 0;
 
-	public DownloadHttpTool(int threadCount, String urlString,
-			String localPath, String fileName, Context context, Handler handler) {
+	public DownloadHttpTool(String urlString,
+			String target, int threadCount, Context context, Handler handler) {
 		super();
-		this.threadCount = threadCount;
 		this.urlstr = urlString;
-		this.localPath = localPath;
+		this.target = target;
+		this.threadCount = threadCount;
 		this.mContext = context;
 		this.mHandler = handler;
-		this.fileName = fileName;
 		sqlTool = new DownlaodSqlTool(mContext);
 	}
 
@@ -71,7 +68,7 @@ public class DownloadHttpTool implements DownLoadAction{
 		if (downloadInfos.size() == 0) {
 			initFirst();
 		} else {
-			File file = new File(localPath + "/" + fileName);
+			File file = new File(target);
 			if (!file.exists()) {
 				sqlTool.delete(urlstr);
 				initFirst();
@@ -108,7 +105,7 @@ public class DownloadHttpTool implements DownLoadAction{
 	public void onDelete() {
 		state = Download_State.Delete;
 		compelete();
-		new File(localPath + File.separator + fileName).delete();
+		new File(target).delete();
 	}
 	@Override
 	public void onReset() {
@@ -141,11 +138,12 @@ public class DownloadHttpTool implements DownLoadAction{
 			connection.setRequestMethod("GET");
 			fileSize = connection.getContentLength();
 			Log.w(TAG, "fileSize::" + fileSize);
-			File fileParent = new File(localPath);
+			String fileParentPath=new File(target).getParent();
+			File fileParent = new File(fileParentPath);
 			if (!fileParent.exists()) {
 				fileParent.mkdir();
 			}
-			File file = new File(fileParent, fileName);
+			File file = new File(target);
 			if (!file.exists()) {
 				file.createNewFile();
 			}
@@ -208,8 +206,7 @@ public class DownloadHttpTool implements DownLoadAction{
 			RandomAccessFile randomAccessFile = null;
 			InputStream is = null;
 			try {
-				randomAccessFile = new RandomAccessFile(localPath
-						+ File.separator + fileName, "rwd");
+				randomAccessFile = new RandomAccessFile(target, "rwd");
 				randomAccessFile.seek(startPos + compeleteSize);
 				URL url = new URL(urlstr);
 				connection = (HttpURLConnection) url.openConnection();
