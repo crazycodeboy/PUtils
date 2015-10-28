@@ -13,7 +13,8 @@ import com.jph.putils.http.download.DownloadHttpTool;
 import com.jph.putils.http.entity.DownLoadAction;
 
 /**
- * 将下载方法封装在此类 提供下载，暂停，删除，以及重置的方法
+ * 多线程断点下载工具类，提供下载，暂停，删除，以及重置的方法
+ * @author JPH
  */
 public class DownloadHandler implements DownLoadAction{
 	/** * 下载失败	 */

@@ -18,6 +18,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 /**
+ * 网络操作工具类
  * Author: JPH
  * Date: 2015/10/14 0014 10:37
  */

@@ -9,7 +9,8 @@ import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.exception.HttpException;
 
 /**
- * 网络操作工具类
+ * 1.网络操作工具类
+ * 2.多线程断点下载工具类，提供下载，暂停，删除，以及重置的方法
  * Author: JPH
  * Date: 2015/10/10 0010 16:55
  */
@@ -31,7 +32,7 @@ public class HttpUtils {
     }
 
     /**
-     * 下载文件
+     * 多线程断点下载，提供下载，暂停，删除，以及重置的方法
      * @param url 文件下载路径
      * @param target 本地保存路径
      * @param threadCount 线程数
@@ -50,7 +51,7 @@ public class HttpUtils {
         return handler;
     }
     /**
-     * 下载文件
+     * 多线程断点下载，提供下载，暂停，删除，以及重置的方法
      * @param url 文件下载路径
      * @param target 本地保存路径
      * @param context
