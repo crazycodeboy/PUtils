@@ -7,6 +7,7 @@ import com.jph.putils.http.HttpHandler;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.exception.HttpException;
+import com.jph.putils.http.entity.DownLoadAction;
 
 /**
  * 1.网络操作工具类
@@ -40,8 +41,8 @@ public class HttpUtils {
      * @param callBack 下载回调
      * @return DownloadHandler,提供了暂停、开始、重置、删除下载控制接口
      */
-    public DownloadHandler download(String url, String target,int threadCount,Context context,RequestCallBack callBack){
-        DownloadHandler handler=null;
+    public DownLoadAction download(String url, String target,int threadCount,Context context,RequestCallBack callBack){
+        DownLoadAction handler=null;
         try {
             handler=new DownloadHandler(url,target,threadCount,context,callBack);
         } catch (Exception e) {
@@ -58,8 +59,8 @@ public class HttpUtils {
      * @param callBack 下载回调
      * @return DownloadHandler,提供了暂停、开始、重置、删除下载控制接口
      */
-    public DownloadHandler download(String url, String target,Context context,RequestCallBack callBack){
-        DownloadHandler handler=null;
+    public DownLoadAction download(String url, String target,Context context,RequestCallBack callBack){
+        DownLoadAction handler=null;
         try {
             handler=new DownloadHandler(url,target,context,callBack);
         } catch (Exception e) {
