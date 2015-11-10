@@ -1,7 +1,9 @@
 apply plugin: 'com.android.application'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "22.0.1"
+
     defaultConfig {
         applicationId "com.jph.simple"
         minSdkVersion 9
@@ -15,11 +17,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-//    repositories {
-//        flatDir {
-//            dirs 'libs'
-//        }
-//    }
 }
 
 dependencies {
@@ -27,7 +24,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:design:23.0.1'
-    compile project(':putils_library')
-    compile project(':KLoginSdk')
-//    compile(name:'KLoginSdk', ext:'aar')
+    compile project(':ksd_android_other/:PUtils/:putils_library')
 }
