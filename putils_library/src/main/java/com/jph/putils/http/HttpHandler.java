@@ -116,7 +116,9 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         OutputStream outputStream = conn.getOutputStream();
         String paramData;
         HttpConfig config=request.getConfig();
-        if (config!=null&&config.isEnableJsonContentType()){
+        if (request.getStringEntity()!=null){
+            paramData=request.getStringEntity();
+        }else if (config!=null&&config.isEnableJsonContentType()){
             paramData=Utils.mapToJsonStr(request.getParams());
         }else {
             paramData=Utils.genFormData(request.getParams());
