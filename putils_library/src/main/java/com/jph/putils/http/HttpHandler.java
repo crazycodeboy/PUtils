@@ -5,6 +5,7 @@ import android.util.Log;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.exception.HttpException;
+import com.jph.putils.http.entity.RequestParams;
 import com.jph.putils.http.entity.ResponseInfo;
 import com.jph.putils.util.HttpCodeUtil;
 import com.jph.putils.util.Utils;
@@ -74,7 +75,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         BaseResponseInfo responseInfo=new BaseResponseInfo();
         HttpURLConnection conn = null;
         try {
-            if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams(), request.getUrl()));
+            if (!isWithData&&request.getParams()!=null)request.setUrl(Utils.genUrlWithParam(request.getParams().getFormParams(), request.getUrl()));
             URL url = new URL(request.getUrl());
             conn= (HttpURLConnection) url.openConnection();
             initConfig(conn, isWithData);
@@ -116,12 +117,14 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         OutputStream outputStream = conn.getOutputStream();
         String paramData;
         HttpConfig config=request.getConfig();
-        if (request.getStringEntity()!=null){
-            paramData=request.getStringEntity();
+        RequestParams params=request.getParams();
+        if (params==null)throw new IllegalArgumentException("RequestParams not be null");
+        if (params.getStringEntity()!=null){
+            paramData=params.getStringEntity();
         }else if (config!=null&&config.isEnableJsonContentType()){
-            paramData=Utils.mapToJsonStr(request.getParams());
+            paramData=params.getJsonParams();
         }else {
-            paramData=Utils.genFormData(request.getParams());
+            paramData=params.getFormParams();
         }
         outputStream.write(paramData.getBytes());
         outputStream.flush();
