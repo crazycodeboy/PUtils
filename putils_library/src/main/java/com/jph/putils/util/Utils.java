@@ -37,10 +37,10 @@ public class Utils {
         return paramsData.toString();
     }
 
-    public static String genUrlWithParam(Map<String, Object> params,String originalUrl){
+    public static String genUrlWithParam(String params,String originalUrl){
         StringBuilder url=new StringBuilder(originalUrl);
         url.append("?");
-        return url.append(genFormData(params)).toString();
+        return url.append(params).toString();
     }
     /**
      * 将Map转换成json string

@@ -1,6 +1,6 @@
 package com.jph.putils.http;
 
-import java.util.Map;
+import com.jph.putils.http.entity.RequestParams;
 
 /**
  * Author: JPH
@@ -9,28 +9,17 @@ import java.util.Map;
 public class HttpRequest {
     private HttpMethod method;
     private String url;
-    private Map<String, Object> params;
-    private String stringEntity;
+    private RequestParams params;
     private HttpConfig config;
-    public HttpRequest(String url, HttpMethod method,Map<String, Object> params) {
+    public HttpRequest(String url, HttpMethod method,RequestParams params) {
         this.url = url;
         this.method = method;
         this.params=params;
     }
-    public HttpRequest(String url, HttpMethod method,Map<String, Object> params,HttpConfig config) {
+    public HttpRequest(String url, HttpMethod method,RequestParams params,HttpConfig config) {
         this(url,method,params);
         this.config=config;
     }
-    public HttpRequest(HttpMethod method, String stringEntity, String url) {
-        this.method = method;
-        this.stringEntity = stringEntity;
-        this.url = url;
-    }
-    public HttpRequest(HttpConfig config, HttpMethod method, String stringEntity, String url) {
-        this(method,stringEntity,url);
-        this.config = config;
-    }
-
     public HttpMethod getMethod() {
         return method;
     }
@@ -40,20 +29,11 @@ public class HttpRequest {
     public void setUrl(String url) {
         this.url = url;
     }
-
-    public Map<String, Object> getParams() {
+    public RequestParams getParams() {
         return params;
     }
     public HttpConfig getConfig() {
         return config;
-    }
-
-    public String getStringEntity() {
-        return stringEntity;
-    }
-
-    public void setStringEntity(String stringEntity) {
-        this.stringEntity = stringEntity;
     }
 
     public static enum HttpMethod {
