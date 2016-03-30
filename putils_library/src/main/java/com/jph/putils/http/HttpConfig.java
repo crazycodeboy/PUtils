@@ -9,6 +9,7 @@ public class HttpConfig {
     private String cookie;
     /**是否启用application/json Content-type的标识*/
     private boolean enableJsonContentType;
+    /**链接超时时间(单位：毫秒)**/
     private int connectTimeout;
     private boolean useCaches ;
     /**

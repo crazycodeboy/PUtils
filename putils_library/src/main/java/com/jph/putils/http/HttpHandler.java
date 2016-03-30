@@ -61,7 +61,6 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
     private void initConfig(HttpURLConnection conn,boolean isWithData) throws ProtocolException {
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);
-        conn.setConnectTimeout(30*1000);
         conn.setDoInput(true);
         if (isWithData)conn.setDoOutput(true);//如果需要上传数据则打开输出设置
         conn.setRequestMethod(request.getMethod().toString());
@@ -70,6 +69,7 @@ public class HttpHandler extends AsyncTask<String, Integer, Object> {
         if (config==null)return;
         conn.setRequestProperty("Cookie",config.getCookie());
         if (config.isEnableJsonContentType())conn.setRequestProperty("Content-type", "application/json");//使用application/json
+        if (config.getConnectTimeout()>0)conn.setConnectTimeout(config.getConnectTimeout());
     }
     private Object onSend(boolean isWithData) {
         Object object = null;
