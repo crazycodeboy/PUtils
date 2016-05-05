@@ -16,6 +16,7 @@ import com.jph.putils.exception.HttpException;
 import com.jph.putils.http.DownloadHandler;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
+import com.jph.putils.http.entity.DownLoadAction;
 import com.jph.putils.http.entity.ResponseInfo;
 
 public class TestDownLoad extends FragmentActivity {
@@ -33,7 +34,7 @@ public class TestDownLoad extends FragmentActivity {
 
 	private int max;
 
-	private DownloadHandler mDownloadUtil;
+	private DownLoadAction mDownloadUtil;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

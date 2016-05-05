@@ -11,8 +11,6 @@ import com.jph.putils.http.HttpRequest;
 import com.jph.putils.http.callback.RequestCallBack;
 import com.jph.putils.http.entity.BaseResponseInfo;
 import com.jph.putils.http.entity.ResponseInfo;
-import com.ksudi.lib.android.login.KLogin;
-import com.ksudi.lib.android.login.util.LoginConfig;
 
 public class Test extends Activity {
 
@@ -23,25 +21,6 @@ public class Test extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
         textView= (TextView) findViewById(R.id.test);
-    }
-    public void login(View view){
-        KLogin.login(this,getLoginConfig(),"526971370@qq.com", "123456", new RequestCallBack() {
-            @Override
-            public void onStart() { }
-            @Override
-            public void onLoading(long total, long current, boolean isUploading) {  }
-            @Override
-            public void onSuccess(ResponseInfo info) {
-                textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie());
-                cookie=info.getCookie();
-            }
-
-            @Override
-            public void onFailure(HttpException error) {
-                BaseResponseInfo info=error.getResponseInfo();
-                textView.setText("time:"+System.currentTimeMillis()+" responseContent:"+info.getResponseContent()+" cookieStr:"+info.getCookie()+" error:"+error.getErrorMsg());
-            }
-        });
     }
     public void access(View view){
         HttpUtils HttpUtils=new HttpUtils();
@@ -69,42 +48,4 @@ public class Test extends Activity {
         });
     }
 
-    public void exit(View view){
-        KLogin.exit(new RequestCallBack() {
-            @Override
-            public void onStart() { }
-            @Override
-            public void onLoading(long total, long current, boolean isUploading) {  }
-            @Override
-            public void onSuccess(ResponseInfo info) {
-                textView.setText("注销成功：" + info.getResponseContent());
-            }
-
-            @Override
-            public void onFailure(HttpException error) {
-                textView.setText("注销失败：" + error.getErrorMsg());
-            }
-        });
-    }
-
-    //    /**
-//     * 获取登录Url配置
-//     * @return
-//     */
-    public static LoginConfig getLoginConfig(){
-        LoginConfig config=new LoginConfig();
-        config.setLoginUrl("http://192.168.1.18:1051/cas/api1/login")
-                .setLogoutUrl("http://192.168.1.18:1051/cas/api1/logout")
-                .setTicketUrl("http://192.168.1.18:1061/api/android/client/test/login/1")
-                .setUploadLogUrl("http://192.168.1.18:1051/cas/api1/uploadLog");
-        return config;
-    }
-//    public static LoginConfig getLoginConfig(){
-//        LoginConfig config=new LoginConfig();
-//        config.setLoginUrl("http://192.168.1.18:1051/cas/api1/login")
-//                .setLogoutUrl("http://192.168.1.18:1051/cas/api1/login")
-//                .setTicketUrl("http://192.168.1.18:1064/api/android/client/test/login/1")
-//                .setUploadLogUrl("http://192.168.1.18:1054/cas/api1/uploadLog");
-//        return config;
-//    }
 }
