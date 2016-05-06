@@ -3,7 +3,7 @@ Android,Http,orm...
 
 
 ##如何在项目中使用Putils  
-----------------------------
+
 Gradle:
 ```
     compile 'com.jph.putils:putils_library:1.0.0'
