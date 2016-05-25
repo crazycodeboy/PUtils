@@ -1,5 +1,6 @@
 package com.jph.putils.util;
 
+import com.google.gson.Gson;
 import com.jph.putils.http.HttpRequest;
 
 import java.io.ByteArrayOutputStream;
@@ -49,21 +50,22 @@ public class Utils {
      */
     public static String mapToJsonStr(Map<String ,Object > params){
         if (params==null|| params.isEmpty())return "";
-        StringBuffer paramsData=new StringBuffer("{");
-        Set<String> keys=params.keySet();
-        for(String key:keys){
-            paramsData.append("\"")
-                    .append(key)
-                    .append("\"")
-                    .append(":")
-                    .append("\"")
-                    .append(params.get(key))
-                    .append("\"")
-                    .append(",");
-        }
-        paramsData.deleteCharAt(paramsData.length()-1);
-        paramsData.append("}");
-        return paramsData.toString();
+//        StringBuffer paramsData=new StringBuffer("{");
+//        Set<String> keys=params.keySet();
+//        for(String key:keys){
+//            paramsData.append("\"")
+//                    .append(key)
+//                    .append("\"")
+//                    .append(":")
+//                    .append("\"")
+//                    .append(params.get(key))
+//                    .append("\"")
+//                    .append(",");
+//        }
+//        paramsData.deleteCharAt(paramsData.length()-1);
+//        paramsData.append("}");
+//        return paramsData.toString();
+        return new Gson().toJson(params);
     }
     /**
      * 根据流返回一个字符串信息
